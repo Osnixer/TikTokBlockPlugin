@@ -1,6 +1,5 @@
 package dev.piotrulla.tiktokblock.hologram.wrapper;
 
-import dev.piotrulla.tiktokblock.hologram.HologramWrapper;
 import org.bukkit.Location;
 
 import java.util.List;

@@ -1,7 +1,7 @@
 package dev.piotrulla.tiktokblock.config.implementation.item;
 
 import dev.piotrulla.tiktokblock.TikTokBlock;
-import dev.piotrulla.tiktokblock.hologram.HologramWrapper;
+import dev.piotrulla.tiktokblock.hologram.wrapper.HologramWrapper;
 import dev.piotrulla.tiktokblock.position.Position;
 import net.dzikoysk.cdn.entity.Contextual;
 import net.dzikoysk.cdn.entity.Exclude;

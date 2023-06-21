@@ -1,6 +1,5 @@
 package dev.piotrulla.tiktokblock.hologram.wrapper;
 
-import dev.piotrulla.tiktokblock.hologram.HologramWrapper;
 import me.filoghost.holographicdisplays.api.HolographicDisplaysAPI;
 import me.filoghost.holographicdisplays.api.hologram.Hologram;
 import org.bukkit.Location;

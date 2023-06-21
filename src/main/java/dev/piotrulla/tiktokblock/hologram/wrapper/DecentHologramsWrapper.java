@@ -1,6 +1,5 @@
 package dev.piotrulla.tiktokblock.hologram.wrapper;
 
-import dev.piotrulla.tiktokblock.hologram.HologramWrapper;
 import eu.decentsoftware.holograms.api.DHAPI;
 import eu.decentsoftware.holograms.api.holograms.Hologram;
 import org.bukkit.Location;

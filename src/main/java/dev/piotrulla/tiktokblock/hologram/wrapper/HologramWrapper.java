@@ -1,4 +1,4 @@
-package dev.piotrulla.tiktokblock.hologram;
+package dev.piotrulla.tiktokblock.hologram.wrapper;
 
 import org.bukkit.Location;
 

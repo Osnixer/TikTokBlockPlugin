@@ -11,9 +11,12 @@ import dev.rollczi.litecommands.command.route.Route;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
-@Route(name = "tiktokblock", aliases = {"ttb"})
+@Route(name = "tiktokblock", aliases = { "ttb" })
 @Permission("tiktokblock.manage")
 public class TikTokBlockCommand {
 
@@ -75,5 +78,35 @@ public class TikTokBlockCommand {
         this.repository.saveBlock(tikTokBlock);
 
         sender.sendMessage(ColorUtil.color("&7Reseted block: &e" + tikTokBlock.name()));
+    }
+
+    @Execute(required = 1, route = "setEfficency")
+    void efficency(Player player, int level) {
+        if (level < 0) {
+            player.sendMessage(ColorUtil.color("&cLevel must be greater than 0!"));
+
+            return;
+        }
+
+        ItemStack item = player.getItemInUse();
+
+        if (item == null) {
+            player.sendMessage(ColorUtil.color("&cYou must hold a tool in your hand!"));
+
+            return;
+        }
+
+        if (!item.getType().toString().contains("PICKAXE")) {
+            player.sendMessage(ColorUtil.color("&cYou must hold a pickaxe in your hand!"));
+
+            return;
+        }
+
+        ItemMeta itemMeta = item.getItemMeta();
+        itemMeta.addEnchant(Enchantment.DIG_SPEED, level, true);
+
+        item.setItemMeta(itemMeta);
+
+        player.sendMessage(ColorUtil.color("&7Updated efficency for item in your hand!"));
     }
 }

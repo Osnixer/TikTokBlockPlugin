@@ -5,6 +5,7 @@ import dev.piotrulla.tiktokblock.bridge.BridgeService;
 import dev.piotrulla.tiktokblock.config.implementation.PluginConfiguration;
 import dev.piotrulla.tiktokblock.hologram.wrapper.DecentHologramsWrapper;
 import dev.piotrulla.tiktokblock.hologram.wrapper.DefaultHologramWrapper;
+import dev.piotrulla.tiktokblock.hologram.wrapper.HologramWrapper;
 import dev.piotrulla.tiktokblock.hologram.wrapper.HolographicDisplaysWrapper;
 import dev.piotrulla.tiktokblock.position.PositionAdapter;
 import dev.piotrulla.tiktokblock.util.ColorUtil;

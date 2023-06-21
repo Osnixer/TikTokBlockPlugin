@@ -1,6 +1,6 @@
 package dev.piotrulla.tiktokblock;
 
-import dev.piotrulla.tiktokblock.hologram.HologramWrapper;
+import dev.piotrulla.tiktokblock.hologram.wrapper.HologramWrapper;
 import dev.piotrulla.tiktokblock.position.Position;
 import org.bukkit.Material;
 
