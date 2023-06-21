@@ -3,12 +3,16 @@ package dev.piotrulla.tiktokblock;
 import dev.piotrulla.tiktokblock.bridge.BridgeService;
 import dev.piotrulla.tiktokblock.command.TikTokBlockArgument;
 import dev.piotrulla.tiktokblock.command.TikTokBlockCommand;
+import dev.piotrulla.tiktokblock.command.handler.InvalidUsageHandler;
+import dev.piotrulla.tiktokblock.command.handler.PermissionHandler;
 import dev.piotrulla.tiktokblock.config.ConfigService;
 import dev.piotrulla.tiktokblock.config.implementation.DataConfiguration;
 import dev.piotrulla.tiktokblock.config.implementation.PluginConfiguration;
 import dev.piotrulla.tiktokblock.hologram.HologramService;
 import dev.rollczi.litecommands.LiteCommands;
 import dev.rollczi.litecommands.bukkit.LiteBukkitFactory;
+import dev.rollczi.litecommands.command.permission.RequiredPermissions;
+import dev.rollczi.litecommands.schematic.Schematic;
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -47,9 +51,12 @@ public class TikTokBlockPlugin extends JavaPlugin {
         server.getPluginManager().registerEvents(new TikTokBlockController(this.pluginConfiguration, this.repository), this);
 
         this.liteCommands = LiteBukkitFactory.builder(server, "tiktokblock")
-                .argument(TikTokBlock.class, new TikTokBlockArgument(this.repository))
+                .argument(TikTokBlock.class, new TikTokBlockArgument(this.repository, this.pluginConfiguration))
 
-                .commandInstance(new TikTokBlockCommand(this.repository))
+                .resultHandler(Schematic.class, new InvalidUsageHandler(this.pluginConfiguration))
+                .resultHandler(RequiredPermissions.class, new PermissionHandler(this.pluginConfiguration))
+
+                .commandInstance(new TikTokBlockCommand(this.repository, configService))
                 .register();
     }
 

@@ -2,6 +2,7 @@ package dev.piotrulla.tiktokblock.command;
 
 import dev.piotrulla.tiktokblock.TikTokBlock;
 import dev.piotrulla.tiktokblock.TikTokBlockRepository;
+import dev.piotrulla.tiktokblock.TikTokSettings;
 import dev.piotrulla.tiktokblock.util.ColorUtil;
 import dev.rollczi.litecommands.argument.ArgumentName;
 import dev.rollczi.litecommands.argument.simple.OneArgument;
@@ -15,16 +16,18 @@ import java.util.List;
 public class TikTokBlockArgument implements OneArgument<TikTokBlock> {
 
     private final TikTokBlockRepository repository;
+    private final TikTokSettings settings;
 
-    public TikTokBlockArgument(TikTokBlockRepository repository) {
+    public TikTokBlockArgument(TikTokBlockRepository repository, TikTokSettings settings) {
         this.repository = repository;
+        this.settings = settings;
     }
 
     @Override
     public Result<TikTokBlock, ?> parse(LiteInvocation invocation, String argument) {
         return this.repository.findBlock(argument)
                 .map(Result::ok)
-                .orElseGet(() -> Result.error(ColorUtil.color("&cTikTokBlock with name " + argument + " not found!")));
+                .orElseGet(() -> Result.error(ColorUtil.color(this.settings.blockNotExists())));
     }
 
     @Override

@@ -2,6 +2,7 @@ package dev.piotrulla.tiktokblock.command;
 
 import dev.piotrulla.tiktokblock.TikTokBlock;
 import dev.piotrulla.tiktokblock.TikTokBlockRepository;
+import dev.piotrulla.tiktokblock.config.ConfigService;
 import dev.piotrulla.tiktokblock.config.implementation.item.TikTokBlockItem;
 import dev.piotrulla.tiktokblock.position.PositionAdapter;
 import dev.piotrulla.tiktokblock.util.ColorUtil;
@@ -21,9 +22,11 @@ import org.bukkit.inventory.meta.ItemMeta;
 public class TikTokBlockCommand {
 
     private final TikTokBlockRepository repository;
+    private final ConfigService configService;
 
-    public TikTokBlockCommand(TikTokBlockRepository repository) {
+    public TikTokBlockCommand(TikTokBlockRepository repository, ConfigService configService) {
         this.repository = repository;
+        this.configService = configService;
     }
 
     @Execute(required = 4, route = "create")
@@ -80,6 +83,13 @@ public class TikTokBlockCommand {
         sender.sendMessage(ColorUtil.color("&7Reseted block: &e" + tikTokBlock.name()));
     }
 
+    @Execute(route = "reload")
+    void reload(CommandSender sender) {
+        this.configService.reload();
+
+        sender.sendMessage(ColorUtil.color("&7Reloaded config!"));
+    }
+
     @Execute(required = 1, route = "setEfficency")
     void efficency(Player player, int level) {
         if (level < 0) {
@@ -106,7 +116,5 @@ public class TikTokBlockCommand {
         itemMeta.addEnchant(Enchantment.DIG_SPEED, level, true);
 
         item.setItemMeta(itemMeta);
-
-        player.sendMessage(ColorUtil.color("&7Updated efficency for item in your hand!"));
     }
 }

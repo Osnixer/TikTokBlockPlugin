@@ -2,7 +2,6 @@ package dev.piotrulla.tiktokblock.hologram;
 
 import dev.piotrulla.tiktokblock.TikTokBlock;
 import dev.piotrulla.tiktokblock.bridge.BridgeService;
-import dev.piotrulla.tiktokblock.config.implementation.PluginConfiguration;
 import dev.piotrulla.tiktokblock.hologram.wrapper.DecentHologramsWrapper;
 import dev.piotrulla.tiktokblock.hologram.wrapper.DefaultHologramWrapper;
 import dev.piotrulla.tiktokblock.hologram.wrapper.HologramWrapper;
@@ -15,12 +14,12 @@ import panda.utilities.text.Formatter;
 
 public class HologramService {
 
-    private final PluginConfiguration configuration;
+    private final HologramSettings hologramSettings;
     private final BridgeService bridgeService;
     private final Plugin plugin;
 
-    public HologramService(PluginConfiguration configuration, BridgeService bridgeService, Plugin plugin) {
-        this.configuration = configuration;
+    public HologramService(HologramSettings hologramSettings, BridgeService bridgeService, Plugin plugin) {
+        this.hologramSettings = hologramSettings;
         this.bridgeService = bridgeService;
         this.plugin = plugin;
     }
@@ -34,7 +33,7 @@ public class HologramService {
 
         Location location = PositionAdapter.convert(tikTokBlock.position())
                 .clone()
-                .add(0.5, this.configuration.hologramHeight, 0.5);
+                .add(0.5, this.hologramSettings.height(), 0.5);
 
         Formatter formatter = new Formatter()
                 .register("{NAME}", tikTokBlock.name())
@@ -43,7 +42,7 @@ public class HologramService {
                 .register("{MULTIPLER}", tikTokBlock.multiplier());
 
         wrapper.createHologram(location);
-        wrapper.setLines(ColorUtil.color(this.configuration.hologramStyle.stream()
+        wrapper.setLines(ColorUtil.color(this.hologramSettings.lines().stream()
                 .map(formatter::format)
                 .toList())
         );
