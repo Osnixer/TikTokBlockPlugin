@@ -1,6 +1,6 @@
 package dev.piotrulla.tiktokblock.command.handler;
 
-import dev.piotrulla.tiktokblock.TikTokSettings;
+import dev.piotrulla.tiktokblock.TikTokMessages;
 import dev.piotrulla.tiktokblock.util.ColorUtil;
 import dev.rollczi.litecommands.command.LiteInvocation;
 import dev.rollczi.litecommands.command.permission.RequiredPermissions;
@@ -11,10 +11,10 @@ import panda.utilities.text.Joiner;
 
 public class PermissionHandler implements Handler<CommandSender, RequiredPermissions> {
 
-    private final TikTokSettings settings;
+    private final TikTokMessages messages;
 
-    public PermissionHandler(TikTokSettings settings) {
-        this.settings = settings;
+    public PermissionHandler(TikTokMessages messages) {
+        this.messages = messages;
     }
 
     @Override
@@ -24,6 +24,6 @@ public class PermissionHandler implements Handler<CommandSender, RequiredPermiss
                         .join(permissions.getPermissions())
                         .toString());
 
-        sender.sendMessage(ColorUtil.color(formatter.format(this.settings.noPermission())));
+        sender.sendMessage(ColorUtil.color(formatter.format(this.messages.noPermission())));
     }
 }

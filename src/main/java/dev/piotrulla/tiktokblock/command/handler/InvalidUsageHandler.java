@@ -1,6 +1,6 @@
 package dev.piotrulla.tiktokblock.command.handler;
 
-import dev.piotrulla.tiktokblock.TikTokSettings;
+import dev.piotrulla.tiktokblock.TikTokMessages;
 import dev.piotrulla.tiktokblock.util.ColorUtil;
 import dev.rollczi.litecommands.command.LiteInvocation;
 import dev.rollczi.litecommands.handle.Handler;
@@ -10,10 +10,10 @@ import panda.utilities.text.Formatter;
 
 public class InvalidUsageHandler implements Handler<CommandSender, Schematic> {
 
-    private final TikTokSettings settings;
+    private final TikTokMessages messages;
 
-    public InvalidUsageHandler(TikTokSettings settings) {
-        this.settings = settings;
+    public InvalidUsageHandler(TikTokMessages messages) {
+        this.messages = messages;
     }
 
     @Override
@@ -22,18 +22,18 @@ public class InvalidUsageHandler implements Handler<CommandSender, Schematic> {
             Formatter formatter = new Formatter()
                     .register("{USAGE}", schematic.first());
 
-            sender.sendMessage(ColorUtil.color(formatter.format(this.settings.invalidUsage())));
+            sender.sendMessage(ColorUtil.color(formatter.format(this.messages.invalidUsage())));
 
             return;
         }
 
-        sender.sendMessage(ColorUtil.color(this.settings.invalidUsageHeader()));
+        sender.sendMessage(ColorUtil.color(this.messages.invalidUsageHeader()));
 
         for (String schema : schematic.getSchematics()) {
             Formatter formatter = new Formatter()
-                    .register("{USAGE}", schema);
+                    .register("{ENTRY}", schema);
 
-            sender.sendMessage(ColorUtil.color(formatter.format(this.settings.invalidUsageEntry())));
+            sender.sendMessage(ColorUtil.color(formatter.format(this.messages.invalidUsageEntry())));
         }
     }
 }

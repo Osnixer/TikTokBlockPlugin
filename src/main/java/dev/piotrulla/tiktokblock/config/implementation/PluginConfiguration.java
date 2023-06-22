@@ -13,27 +13,20 @@ import java.util.List;
 
 public class PluginConfiguration implements ReloadableConfig, HologramSettings, TikTokSettings {
 
-    private String blockNotExistsMessage = "&cBlock with this name not exists!";
-    private String noPermission = "&cYou don't have permission to do this! &7({PERMISSIONS})";
-    private String invalidUsage = "&cInvalid usage! &7({USAGE})";
-    private String invalidUsageHeader = "&cInvalid usage!";
-    private String invalidUsageEntry = "&7{ENTRY}";
-    private String winTitleMessage = "&aYou won!";
-    private String winSubTitleMessage = "&7You have won the block game!";
     private int fadeIn = 10;
     private int stay = 40;
     private int fadeOut = 10;
 
     private Material winMaterial = Material.AIR;
 
-    private double hologramHeight = 1.5;
+    private double hologramHeight = 4.5;
 
     private List<String> hologramLines = Arrays.asList(
             "           &9TikTokBlock v1.0.0",
             "&7https://github.com/Osnixer/TikTokBlockPlugin",
             "            &7by Piotrulla &c<3",
             "",
-            "&7Block name: &c{BLOCK-NAME}",
+            "&7Block name: &c{NAME}",
             "&7Current Block health: &c{CURRENT-HP}",
             "&7Block start health: &c{BASE-HP}",
             "&7Block multiplier: &ex&c{MULTIPLIER}"
@@ -52,41 +45,6 @@ public class PluginConfiguration implements ReloadableConfig, HologramSettings, 
     @Override
     public double height() {
         return this.hologramHeight;
-    }
-
-    @Override
-    public String blockNotExists() {
-        return this.blockNotExistsMessage;
-    }
-
-    @Override
-    public String invalidUsage() {
-        return this.invalidUsage;
-    }
-
-    @Override
-    public String invalidUsageHeader() {
-        return this.invalidUsageHeader;
-    }
-
-    @Override
-    public String invalidUsageEntry() {
-        return this.invalidUsageEntry;
-    }
-
-    @Override
-    public String noPermission() {
-        return this.noPermission;
-    }
-
-    @Override
-    public String winTitle() {
-        return this.winTitleMessage;
-    }
-
-    @Override
-    public String winSubTitle() {
-        return this.winSubTitleMessage;
     }
 
     @Override

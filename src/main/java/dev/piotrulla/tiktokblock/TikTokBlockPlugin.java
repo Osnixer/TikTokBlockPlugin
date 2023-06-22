@@ -7,21 +7,24 @@ import dev.piotrulla.tiktokblock.command.handler.InvalidUsageHandler;
 import dev.piotrulla.tiktokblock.command.handler.PermissionHandler;
 import dev.piotrulla.tiktokblock.config.ConfigService;
 import dev.piotrulla.tiktokblock.config.implementation.DataConfiguration;
+import dev.piotrulla.tiktokblock.config.implementation.MessagesConfiguration;
 import dev.piotrulla.tiktokblock.config.implementation.PluginConfiguration;
 import dev.piotrulla.tiktokblock.hologram.HologramService;
 import dev.rollczi.litecommands.LiteCommands;
 import dev.rollczi.litecommands.bukkit.LiteBukkitFactory;
+import dev.rollczi.litecommands.bukkit.tools.BukkitOnlyPlayerContextual;
 import dev.rollczi.litecommands.command.permission.RequiredPermissions;
 import dev.rollczi.litecommands.schematic.Schematic;
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitTask;
 
 public class TikTokBlockPlugin extends JavaPlugin {
 
     private ConfigService configService;
     private PluginConfiguration pluginConfiguration;
+    private MessagesConfiguration messagesConfiguration;
 
     private BridgeService bridgeService;
 
@@ -29,14 +32,13 @@ public class TikTokBlockPlugin extends JavaPlugin {
 
     private HologramService hologramService;
 
-    private volatile BukkitTask updateTask;
-
     private LiteCommands<CommandSender> liteCommands;
 
     @Override
     public void onEnable() {
         this.configService = new ConfigService(this.getDataFolder());
         this.pluginConfiguration = this.configService.load(new PluginConfiguration());
+        this.messagesConfiguration = this.configService.load(new MessagesConfiguration());
 
         Server server = this.getServer();
 
@@ -46,24 +48,22 @@ public class TikTokBlockPlugin extends JavaPlugin {
         this.repository = this.configService.load(new DataConfiguration(this.configService));
         this.hologramService = new HologramService(this.pluginConfiguration, this.bridgeService, this);
 
-        this.updateTask = server.getScheduler().runTaskTimer(this, new TikTokBlockTask(this.repository, this.hologramService), 20L, 20L);
-
-        server.getPluginManager().registerEvents(new TikTokBlockController(this.pluginConfiguration, this.repository), this);
+        server.getPluginManager().registerEvents(new TikTokBlockController(this.pluginConfiguration, this.repository, this.hologramService, this.messagesConfiguration), this);
 
         this.liteCommands = LiteBukkitFactory.builder(server, "tiktokblock")
-                .argument(TikTokBlock.class, new TikTokBlockArgument(this.repository, this.pluginConfiguration))
+                .argument(TikTokBlock.class, new TikTokBlockArgument(this.repository, this.messagesConfiguration))
 
-                .resultHandler(Schematic.class, new InvalidUsageHandler(this.pluginConfiguration))
-                .resultHandler(RequiredPermissions.class, new PermissionHandler(this.pluginConfiguration))
+                .contextualBind(Player.class, new BukkitOnlyPlayerContextual<>("only-player"))
 
-                .commandInstance(new TikTokBlockCommand(this.repository, configService))
+                .resultHandler(Schematic.class, new InvalidUsageHandler(this.messagesConfiguration))
+                .resultHandler(RequiredPermissions.class, new PermissionHandler(this.messagesConfiguration))
+
+                .commandInstance(new TikTokBlockCommand(this.repository, hologramService, this.configService, this.messagesConfiguration))
                 .register();
     }
 
     @Override
     public void onDisable() {
-        this.updateTask.cancel();
-
         for (TikTokBlock tikTokBlock : this.repository.tikTokBlocks()) {
             tikTokBlock.hologram().deleteHologram();
         }

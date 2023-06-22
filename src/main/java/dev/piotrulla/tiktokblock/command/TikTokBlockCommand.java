@@ -2,10 +2,11 @@ package dev.piotrulla.tiktokblock.command;
 
 import dev.piotrulla.tiktokblock.TikTokBlock;
 import dev.piotrulla.tiktokblock.TikTokBlockRepository;
+import dev.piotrulla.tiktokblock.TikTokMessages;
 import dev.piotrulla.tiktokblock.config.ConfigService;
-import dev.piotrulla.tiktokblock.config.implementation.item.TikTokBlockItem;
-import dev.piotrulla.tiktokblock.position.PositionAdapter;
+import dev.piotrulla.tiktokblock.hologram.HologramService;
 import dev.piotrulla.tiktokblock.util.ColorUtil;
+import dev.rollczi.litecommands.argument.Arg;
 import dev.rollczi.litecommands.command.execute.Execute;
 import dev.rollczi.litecommands.command.permission.Permission;
 import dev.rollczi.litecommands.command.route.Route;
@@ -14,6 +15,7 @@ import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -22,92 +24,107 @@ import org.bukkit.inventory.meta.ItemMeta;
 public class TikTokBlockCommand {
 
     private final TikTokBlockRepository repository;
+    private final HologramService hologramService;
     private final ConfigService configService;
+    private final TikTokMessages messages;
 
-    public TikTokBlockCommand(TikTokBlockRepository repository, ConfigService configService) {
+    public TikTokBlockCommand(TikTokBlockRepository repository, HologramService hologramService, ConfigService configService, TikTokMessages messages) {
         this.repository = repository;
+        this.hologramService = hologramService;
         this.configService = configService;
+        this.messages = messages;
     }
 
     @Execute(required = 4, route = "create")
-    void create(Player player, String name, Material material, double multiplier, int baseHealth) {
+    void create(Player player, @Arg String name, @Arg Material material, @Arg double multiplier, @Arg int baseHealth) {
         Location location = player.getLocation();
+        Location blockLocation = new Location(player.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
 
-        TikTokBlock block = new TikTokBlockItem(
+        TikTokBlock tikTokBlock = new TikTokBlock(
                 name,
-                PositionAdapter.convert(location),
+                blockLocation,
                 material,
                 multiplier,
                 baseHealth
         );
 
-        this.repository.saveBlock(block);
+        blockLocation.getBlock().setType(material);
+
+        this.repository.saveBlock(tikTokBlock);
+
+        this.hologramService.updateHologram(tikTokBlock);
+
+        player.sendMessage(ColorUtil.color(this.messages.createMessage()));
     }
 
     @Execute(required = 1, route = "remove")
-    void remove(CommandSender sender, TikTokBlock block) {
+    void remove(CommandSender sender, @Arg TikTokBlock block) {
+        if (block.hologram() != null) {
+            block.hologram().deleteHologram();
+        }
+
         this.repository.removeBlock(block);
 
-        sender.sendMessage(ColorUtil.color("&7Removed block: &e" + block.name()));
+        sender.sendMessage(ColorUtil.color(this.messages.deleteMessage()));
     }
 
     @Execute(required = 2, route = "addHealth")
-    void addHealth(CommandSender sender, TikTokBlock tikTokBlock, double health) {
+    void addHealth(CommandSender sender, @Arg TikTokBlock tikTokBlock, @Arg double health) {
         tikTokBlock.updateHealth(tikTokBlock.health() + health);
         this.repository.saveBlock(tikTokBlock);
 
-        sender.sendMessage(ColorUtil.color("&7Updated health for block: &e" + tikTokBlock.name()));
+        sender.sendMessage(ColorUtil.color(this.messages.addHealthMessage()));
     }
 
     @Execute(required = 2, route = "removeHealth")
-    void removeHealth(CommandSender sender, TikTokBlock tikTokBlock, double health) {
+    void removeHealth(CommandSender sender, @Arg TikTokBlock tikTokBlock, @Arg double health) {
         tikTokBlock.updateHealth(tikTokBlock.health() - health);
         this.repository.saveBlock(tikTokBlock);
 
-        sender.sendMessage(ColorUtil.color("&7Updated health for block: &e" + tikTokBlock.name()));
+        sender.sendMessage(ColorUtil.color(this.messages.removeHealthMessage()));
     }
 
     @Execute(required = 2, route = "setMultiplier")
-    void setMultiplier(CommandSender sender, TikTokBlock tikTokBlock, double multiplier) {
+    void setMultiplier(CommandSender sender, @Arg TikTokBlock tikTokBlock, @Arg double multiplier) {
         tikTokBlock.updateMultiplier(multiplier);
         this.repository.saveBlock(tikTokBlock);
 
-        sender.sendMessage(ColorUtil.color("&7Updated multiplier for block: &e" + tikTokBlock.name()));
+        sender.sendMessage(ColorUtil.color(this.messages.multiplerMessage()));
     }
 
     @Execute(required = 1, route = "reset")
-    void reset(CommandSender sender, TikTokBlock tikTokBlock) {
+    void reset(CommandSender sender, @Arg TikTokBlock tikTokBlock) {
         tikTokBlock.updateHealth(tikTokBlock.baseHealth());
+        this.hologramService.updateHologram(tikTokBlock);
+
         this.repository.saveBlock(tikTokBlock);
 
-        sender.sendMessage(ColorUtil.color("&7Reseted block: &e" + tikTokBlock.name()));
+        sender.sendMessage(ColorUtil.color(this.messages.resetMessage()));
     }
 
     @Execute(route = "reload")
     void reload(CommandSender sender) {
         this.configService.reload();
 
-        sender.sendMessage(ColorUtil.color("&7Reloaded config!"));
+        for (TikTokBlock tikTokBlock : this.repository.tikTokBlocks()) {
+            this.hologramService.updateHologram(tikTokBlock);
+        }
+
+        sender.sendMessage(ColorUtil.color(this.messages.reloadMessage()));
     }
 
     @Execute(required = 1, route = "setEfficency")
-    void efficency(Player player, int level) {
+    void efficency(Player player, @Arg int level) {
         if (level < 0) {
-            player.sendMessage(ColorUtil.color("&cLevel must be greater than 0!"));
+            player.sendMessage(ColorUtil.color(this.messages.greaterThanZero()));
 
             return;
         }
 
-        ItemStack item = player.getItemInUse();
+        ItemStack item = player.getInventory().getItem(EquipmentSlot.HAND);
 
-        if (item == null) {
-            player.sendMessage(ColorUtil.color("&cYou must hold a tool in your hand!"));
-
-            return;
-        }
-
-        if (!item.getType().toString().contains("PICKAXE")) {
-            player.sendMessage(ColorUtil.color("&cYou must hold a pickaxe in your hand!"));
+        if (item == null || !item.getType().toString().contains("PICKAXE")) {
+            player.sendMessage(ColorUtil.color(this.messages.onlyPickaxe()));
 
             return;
         }
@@ -116,5 +133,7 @@ public class TikTokBlockCommand {
         itemMeta.addEnchant(Enchantment.DIG_SPEED, level, true);
 
         item.setItemMeta(itemMeta);
+
+        player.sendMessage(ColorUtil.color(this.messages.efficiencyMessage()));
     }
 }

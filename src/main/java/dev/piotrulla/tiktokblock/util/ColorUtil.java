@@ -3,6 +3,7 @@ package dev.piotrulla.tiktokblock.util;
 import org.bukkit.ChatColor;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public final class ColorUtil {
 
@@ -16,6 +17,6 @@ public final class ColorUtil {
     public static List<String> color(List<String> toColor) {
         return toColor.stream()
                 .map(ColorUtil::color)
-                .toList();
+                .collect(Collectors.toList());
     }
 }

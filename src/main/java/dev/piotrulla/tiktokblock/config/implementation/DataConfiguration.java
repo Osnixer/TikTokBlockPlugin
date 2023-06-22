@@ -4,8 +4,6 @@ import dev.piotrulla.tiktokblock.TikTokBlock;
 import dev.piotrulla.tiktokblock.TikTokBlockRepository;
 import dev.piotrulla.tiktokblock.config.ConfigService;
 import dev.piotrulla.tiktokblock.config.ReloadableConfig;
-import dev.piotrulla.tiktokblock.position.Position;
-import dev.piotrulla.tiktokblock.position.PositionAdapter;
 import net.dzikoysk.cdn.entity.Exclude;
 import net.dzikoysk.cdn.source.Resource;
 import net.dzikoysk.cdn.source.Source;
@@ -14,16 +12,16 @@ import org.bukkit.Location;
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class DataConfiguration implements ReloadableConfig, TikTokBlockRepository {
 
     @Exclude
     private final ConfigService configService;
 
-    private Map<String, TikTokBlock> blocks = new ConcurrentHashMap<>();
+    private Map<String, TikTokBlock> blocks = new HashMap<>();
 
     public DataConfiguration(ConfigService configService) {
         this.configService = configService;
@@ -44,11 +42,9 @@ public class DataConfiguration implements ReloadableConfig, TikTokBlockRepositor
 
     @Override
     public Optional<TikTokBlock> findBlock(Location location) {
-        Position position = PositionAdapter.convert(location);
-
         return this.blocks.values()
                 .stream()
-                .filter(block -> block.position().equals(position))
+                .filter(block -> block.location().equals(location))
                 .findFirst();
     }
 
@@ -71,11 +67,11 @@ public class DataConfiguration implements ReloadableConfig, TikTokBlockRepositor
 
     @Override
     public void saveBlock(TikTokBlock block) {
-        if (this.blocks.get(block.name()) != null) {
-            this.blocks.remove(block.name());
-        }
+        Map<String, TikTokBlock> copy = new HashMap<>(this.blocks);
 
-        this.blocks.put(block.name(), block);
+        copy.put(block.name(), block);
+
+        this.blocks = copy;
 
         this.configService.save(this);
     }

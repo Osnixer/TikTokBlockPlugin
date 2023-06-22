@@ -4,6 +4,7 @@ plugins {
     id("java-library")
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("net.minecrell.plugin-yml.bukkit") version "0.5.2"
+    id("xyz.jpenilla.run-paper") version "2.1.0"
 }
 
 group = "dev.piotrulla.tiktokblock"
@@ -54,7 +55,13 @@ bukkit {
 }
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(16))
+    toolchain.languageVersion.set(JavaLanguageVersion.of(11))
+}
+
+tasks {
+    runServer {
+        minecraftVersion("1.16.5")
+    }
 }
 
 tasks.withType<JavaCompile> {
@@ -84,9 +91,7 @@ tasks.withType<ShadowJar> {
         "org.panda_lang",
         "org.bstats",
         "net.dzikoysk",
-        "net.kyori",
-        "com.j256",
-        "dev.triumphteam"
+        "dev.rollczi"
     ).forEach { pack ->
         relocate(pack, "$prefix.$pack")
     }

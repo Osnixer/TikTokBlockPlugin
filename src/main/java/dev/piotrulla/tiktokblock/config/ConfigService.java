@@ -3,6 +3,7 @@ package dev.piotrulla.tiktokblock.config;
 import net.dzikoysk.cdn.Cdn;
 import net.dzikoysk.cdn.CdnFactory;
 import net.dzikoysk.cdn.reflect.Visibility;
+import org.bukkit.Location;
 
 import java.io.File;
 import java.util.HashSet;
@@ -14,6 +15,7 @@ public class ConfigService {
             .createYamlLike()
             .getSettings()
             .withMemberResolver(Visibility.PRIVATE)
+            .withComposer(Location.class, new LocationComposer())
             .build();
 
     private final Set<ReloadableConfig> configs = new HashSet<>();

@@ -6,11 +6,12 @@ import dev.piotrulla.tiktokblock.hologram.wrapper.DecentHologramsWrapper;
 import dev.piotrulla.tiktokblock.hologram.wrapper.DefaultHologramWrapper;
 import dev.piotrulla.tiktokblock.hologram.wrapper.HologramWrapper;
 import dev.piotrulla.tiktokblock.hologram.wrapper.HolographicDisplaysWrapper;
-import dev.piotrulla.tiktokblock.position.PositionAdapter;
 import dev.piotrulla.tiktokblock.util.ColorUtil;
 import org.bukkit.Location;
 import org.bukkit.plugin.Plugin;
 import panda.utilities.text.Formatter;
+
+import java.util.stream.Collectors;
 
 public class HologramService {
 
@@ -27,30 +28,31 @@ public class HologramService {
     public void updateHologram(TikTokBlock tikTokBlock) {
         HologramWrapper wrapper = tikTokBlock.hologram();
 
-        if (wrapper == null) {
-            wrapper = this.createHologram();
-        }
-
-        Location location = PositionAdapter.convert(tikTokBlock.position())
+        Location location = tikTokBlock.location()
                 .clone()
                 .add(0.5, this.hologramSettings.height(), 0.5);
+
+        if (wrapper == null) {
+            wrapper = this.createWrapper();
+
+            wrapper.createHologram(location);
+        }
 
         Formatter formatter = new Formatter()
                 .register("{NAME}", tikTokBlock.name())
                 .register("{BASE-HP}", tikTokBlock.baseHealth())
                 .register("{CURRENT-HP}", tikTokBlock.health())
-                .register("{MULTIPLER}", tikTokBlock.multiplier());
+                .register("{MULTIPLIER}", tikTokBlock.multiplier());
 
-        wrapper.createHologram(location);
         wrapper.setLines(ColorUtil.color(this.hologramSettings.lines().stream()
                 .map(formatter::format)
-                .toList())
+                .collect(Collectors.toList()))
         );
 
         tikTokBlock.updateHologram(wrapper);
     }
 
-    HologramWrapper createHologram() {
+    HologramWrapper createWrapper() {
         if (!this.bridgeService.isDecentHolo() && !this.bridgeService.isHoloDisplays()) {
             return new DefaultHologramWrapper();
         }
