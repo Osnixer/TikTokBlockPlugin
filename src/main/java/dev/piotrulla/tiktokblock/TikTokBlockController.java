@@ -26,8 +26,6 @@ public class TikTokBlockController implements Listener {
     void onBreak(BlockBreakEvent event) {
         Block block = event.getBlock();
 
-        System.out.println(this.repository.findBlock(block.getLocation()));
-
         this.repository.findBlock(block.getLocation()).ifPresent(tikTokBlock -> {
             if (block.getType() != tikTokBlock.material()) {
                 return;
