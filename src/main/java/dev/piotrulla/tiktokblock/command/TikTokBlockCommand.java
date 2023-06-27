@@ -84,9 +84,9 @@ public class TikTokBlockCommand {
         sender.sendMessage(ColorUtil.color(this.messages.removeHealthMessage()));
     }
 
-    @Execute(required = 2, route = "setMultiplier")
+    @Execute(required = 2, route = "addMultiplier")
     void setMultiplier(CommandSender sender, @Arg TikTokBlock tikTokBlock, @Arg double multiplier) {
-        tikTokBlock.updateMultiplier(multiplier);
+        tikTokBlock.updateMultiplier(tikTokBlock.multiplier() + multiplier);
         this.repository.saveBlock(tikTokBlock);
 
         sender.sendMessage(ColorUtil.color(this.messages.multiplerMessage()));
@@ -113,7 +113,7 @@ public class TikTokBlockCommand {
         sender.sendMessage(ColorUtil.color(this.messages.reloadMessage()));
     }
 
-    @Execute(required = 1, route = "setEfficency")
+    @Execute(required = 1, route = "addEfficency")
     void efficency(Player player, @Arg int level) {
         if (level < 0) {
             player.sendMessage(ColorUtil.color(this.messages.greaterThanZero()));
@@ -130,7 +130,9 @@ public class TikTokBlockCommand {
         }
 
         ItemMeta itemMeta = item.getItemMeta();
-        itemMeta.addEnchant(Enchantment.DIG_SPEED, level, true);
+
+        int currentLevel = itemMeta.getEnchantLevel(Enchantment.DIG_SPEED);
+        itemMeta.addEnchant(Enchantment.DIG_SPEED, currentLevel + level, true);
 
         item.setItemMeta(itemMeta);
 
