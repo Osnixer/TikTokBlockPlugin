@@ -11,4 +11,17 @@ public interface TikTokSettings {
     int fadeOut();
 
     Material winMaterial();
+
+    int tntRadius();
+
+    int tntPointOfHp();
+
+    boolean tntCheckMultiplier();
+
+    int autoExecuteTntAfterHp();
+
+    int coordRandomMax();
+
+    int coordStaticY();
+
 }

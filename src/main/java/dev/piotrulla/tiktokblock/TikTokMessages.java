@@ -23,5 +23,7 @@ public interface TikTokMessages {
     String resetMessage();
     String reloadMessage();
     String efficiencyMessage();
+
+    String boomMessage();
     
 }

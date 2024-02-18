@@ -58,7 +58,10 @@ public class TikTokBlockPlugin extends JavaPlugin {
                 .resultHandler(Schematic.class, new InvalidUsageHandler(this.messagesConfiguration))
                 .resultHandler(RequiredPermissions.class, new PermissionHandler(this.messagesConfiguration))
 
-                .commandInstance(new TikTokBlockCommand(this.repository, hologramService, this.configService, this.messagesConfiguration))
+                .commandInstance(new TikTokBlockCommand(
+                        this.repository, this.hologramService, this.configService,
+                        this.pluginConfiguration, this.messagesConfiguration,
+                        this, server))
                 .register();
     }
 

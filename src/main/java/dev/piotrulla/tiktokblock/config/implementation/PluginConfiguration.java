@@ -22,8 +22,8 @@ public class PluginConfiguration implements ReloadableConfig, HologramSettings, 
     private double hologramHeight = 4.5;
 
     private List<String> hologramLines = Arrays.asList(
-            "           &9TikTokBlock v1.0.0",
-            "&7https://github.com/Osnixer/TikTokBlockPlugin",
+            "           &9TikTokBlock v1.1.0",
+            "&7https://github.com/P1otrulla/TikTokBlockPlugin",
             "            &7by Piotrulla &c<3",
             "",
             "&7Block name: &c{NAME}",
@@ -31,6 +31,14 @@ public class PluginConfiguration implements ReloadableConfig, HologramSettings, 
             "&7Block start health: &c{BASE-HP}",
             "&7Block multiplier: &ex&c{MULTIPLIER}"
     );
+
+    private int coordXRandomMax = 4;
+    private int coordStaticY = 13;
+
+    private int tntRadius = 2;
+    private int tntPointOfHp = 2;
+    private boolean tntCheckMultiplier = true;
+    private int autoExecuteTntAfterHp = 1_000;
 
     @Override
     public Resource resource(File folder) {
@@ -65,5 +73,35 @@ public class PluginConfiguration implements ReloadableConfig, HologramSettings, 
     @Override
     public Material winMaterial() {
         return this.winMaterial;
+    }
+
+    @Override
+    public int tntRadius() {
+        return this.tntRadius;
+    }
+
+    @Override
+    public int tntPointOfHp() {
+        return this.tntPointOfHp;
+    }
+
+    @Override
+    public boolean tntCheckMultiplier() {
+        return this.tntCheckMultiplier;
+    }
+
+    @Override
+    public int autoExecuteTntAfterHp() {
+        return this.autoExecuteTntAfterHp;
+    }
+
+    @Override
+    public int coordRandomMax() {
+        return this.coordXRandomMax;
+    }
+
+    @Override
+    public int coordStaticY() {
+        return this.coordStaticY;
     }
 }

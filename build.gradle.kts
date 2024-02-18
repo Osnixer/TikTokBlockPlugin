@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "dev.piotrulla.tiktokblock"
-version = "1.0.0"
+version = "1.1.0"
 val mainPackage = "dev.piotrulla.tiktokblock"
 
 repositories {

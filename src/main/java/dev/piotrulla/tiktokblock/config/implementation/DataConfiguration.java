@@ -49,6 +49,14 @@ public class DataConfiguration implements ReloadableConfig, TikTokBlockRepositor
     }
 
     @Override
+    public Optional<TikTokBlock> findBlockInRadius(Location location, int radius) {
+        return this.blocks.values()
+                .stream()
+                .filter(block -> block.location().distance(location) <= radius)
+                .findFirst();
+    }
+
+    @Override
     public Collection<TikTokBlock> tikTokBlocks() {
         return Collections.unmodifiableCollection(this.blocks.values());
     }

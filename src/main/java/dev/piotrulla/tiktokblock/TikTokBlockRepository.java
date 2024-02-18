@@ -11,6 +11,8 @@ public interface TikTokBlockRepository {
 
     Optional<TikTokBlock> findBlock(Location location);
 
+    Optional<TikTokBlock> findBlockInRadius(Location location, int radius);
+
     Collection<TikTokBlock> tikTokBlocks();
 
     Collection<String> tikTokBlocksNames();

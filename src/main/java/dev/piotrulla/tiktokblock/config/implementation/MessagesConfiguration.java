@@ -29,6 +29,8 @@ public class MessagesConfiguration implements ReloadableConfig, TikTokMessages {
     private String reloadMessage = "&aTikTokBlockPlugin reloaded!";
     private String efficiencyMessage = "&aEfficiency set!";
 
+    private String boomMessage = "&cRICO: &6boom boom? &cSKIPPER: &6Yes Rico, boom boom!";
+
     @Override
     public Resource resource(File folder) {
         return Source.of(folder, "messages.yml");
@@ -87,6 +89,11 @@ public class MessagesConfiguration implements ReloadableConfig, TikTokMessages {
     @Override
     public String efficiencyMessage() {
         return this.efficiencyMessage;
+    }
+
+    @Override
+    public String boomMessage() {
+        return this.boomMessage;
     }
 
     @Override

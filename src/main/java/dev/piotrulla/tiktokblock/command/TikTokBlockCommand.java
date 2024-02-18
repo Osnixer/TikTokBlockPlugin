@@ -2,7 +2,9 @@ package dev.piotrulla.tiktokblock.command;
 
 import dev.piotrulla.tiktokblock.TikTokBlock;
 import dev.piotrulla.tiktokblock.TikTokBlockRepository;
+import dev.piotrulla.tiktokblock.TikTokBlockTask;
 import dev.piotrulla.tiktokblock.TikTokMessages;
+import dev.piotrulla.tiktokblock.TikTokSettings;
 import dev.piotrulla.tiktokblock.config.ConfigService;
 import dev.piotrulla.tiktokblock.hologram.HologramService;
 import dev.piotrulla.tiktokblock.util.ColorUtil;
@@ -12,12 +14,16 @@ import dev.rollczi.litecommands.command.permission.Permission;
 import dev.rollczi.litecommands.command.route.Route;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.Plugin;
+
+import java.time.Duration;
 
 @Route(name = "tiktokblock", aliases = { "ttb" })
 @Permission("tiktokblock.manage")
@@ -26,13 +32,19 @@ public class TikTokBlockCommand {
     private final TikTokBlockRepository repository;
     private final HologramService hologramService;
     private final ConfigService configService;
+    private final TikTokSettings settings;
     private final TikTokMessages messages;
+    private final Plugin plugin;
+    private final Server server;
 
-    public TikTokBlockCommand(TikTokBlockRepository repository, HologramService hologramService, ConfigService configService, TikTokMessages messages) {
+    public TikTokBlockCommand(TikTokBlockRepository repository, HologramService hologramService, ConfigService configService, TikTokSettings settings, TikTokMessages messages, Plugin plugin, Server server) {
         this.repository = repository;
         this.hologramService = hologramService;
         this.configService = configService;
+        this.settings = settings;
         this.messages = messages;
+        this.plugin = plugin;
+        this.server = server;
     }
 
     @Execute(required = 4, route = "create")
@@ -50,9 +62,7 @@ public class TikTokBlockCommand {
 
         blockLocation.getBlock().setType(material);
 
-        this.repository.saveBlock(tikTokBlock);
-
-        this.hologramService.updateHologram(tikTokBlock);
+        this.saveAndUpdate(tikTokBlock);
 
         player.sendMessage(ColorUtil.color(this.messages.createMessage()));
     }
@@ -68,10 +78,23 @@ public class TikTokBlockCommand {
         sender.sendMessage(ColorUtil.color(this.messages.deleteMessage()));
     }
 
+    @Execute(required = 4, route = "tnt")
+    void tnt(CommandSender sender, @Arg TikTokBlock tikTokBlock, @Arg int limit, @Arg Duration cooldown, @Arg int limitPerCooldown) {
+        TikTokBlock.TNT tnt = new TikTokBlock.TNT(limit, cooldown, limitPerCooldown);
+
+        tnt.lastUse();
+
+        TikTokBlockTask tikTokBlockTask = new TikTokBlockTask(this.settings, tikTokBlock);
+        tnt.updateTask(this.server.getScheduler().runTaskTimer(this.plugin, tikTokBlockTask, 20L, 20L));
+
+        sender.sendMessage(ColorUtil.color(this.messages.boomMessage()));
+    }
+
     @Execute(required = 2, route = "addHealth")
     void addHealth(CommandSender sender, @Arg TikTokBlock tikTokBlock, @Arg double health) {
         tikTokBlock.updateHealth(tikTokBlock.health() + health);
-        this.repository.saveBlock(tikTokBlock);
+
+        this.saveAndUpdate(tikTokBlock);
 
         sender.sendMessage(ColorUtil.color(this.messages.addHealthMessage()));
     }
@@ -79,7 +102,8 @@ public class TikTokBlockCommand {
     @Execute(required = 2, route = "removeHealth")
     void removeHealth(CommandSender sender, @Arg TikTokBlock tikTokBlock, @Arg double health) {
         tikTokBlock.updateHealth(tikTokBlock.health() - health);
-        this.repository.saveBlock(tikTokBlock);
+
+        this.saveAndUpdate(tikTokBlock);
 
         sender.sendMessage(ColorUtil.color(this.messages.removeHealthMessage()));
     }
@@ -87,7 +111,8 @@ public class TikTokBlockCommand {
     @Execute(required = 2, route = "addMultiplier")
     void setMultiplier(CommandSender sender, @Arg TikTokBlock tikTokBlock, @Arg double multiplier) {
         tikTokBlock.updateMultiplier(tikTokBlock.multiplier() + multiplier);
-        this.repository.saveBlock(tikTokBlock);
+
+        this.saveAndUpdate(tikTokBlock);
 
         sender.sendMessage(ColorUtil.color(this.messages.multiplerMessage()));
     }
@@ -95,9 +120,8 @@ public class TikTokBlockCommand {
     @Execute(required = 1, route = "reset")
     void reset(CommandSender sender, @Arg TikTokBlock tikTokBlock) {
         tikTokBlock.updateHealth(tikTokBlock.baseHealth());
-        this.hologramService.updateHologram(tikTokBlock);
 
-        this.repository.saveBlock(tikTokBlock);
+        this.saveAndUpdate(tikTokBlock);
 
         sender.sendMessage(ColorUtil.color(this.messages.resetMessage()));
     }
@@ -137,5 +161,11 @@ public class TikTokBlockCommand {
         item.setItemMeta(itemMeta);
 
         player.sendMessage(ColorUtil.color(this.messages.efficiencyMessage()));
+    }
+
+    void saveAndUpdate(TikTokBlock tikTokBlock) {
+        this.hologramService.updateHologram(tikTokBlock);
+
+        this.repository.saveBlock(tikTokBlock);
     }
 }
